@@ -94,19 +94,25 @@ namespace parser
 
 }
 
-
-
 #include <stdio.h>
 
 int main()
 {
-	typedef parser::Char<'a'> a;
-	typedef parser::Text<'a','i','u','e','o'> aiueo;
+	{
+		typedef parser::Char<'a','i','u','e','o'> charany;
 
-	const char *source="aiueooo";
-	bool is=aiueo::Parse(source);
+		const char *source="ouieaieA";
+		while(charany::Parse(source))
+			printf("1");
+		printf("\n");
+	}
+	{
+		typedef parser::Text<'a','i','u','e','o'> seq;
 
-	printf("%d\n",is);
+		const char *source="aiueooo";
+
+		printf("%d - %s\n",seq::Parse(source),source);
+	}
 
 	return 0;
 }
