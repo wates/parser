@@ -92,9 +92,31 @@ namespace parser
 		}
 	};
 
+	template <char min,char max>
+	struct Range
+	{
+		static bool Parse(const char *&text)
+		{
+			if(min<=*text&&max>=*text)
+			{
+				text++;
+				return true;
+			}
+			return false;
+		}
+	};
+
 }
 
 #include <stdio.h>
+
+template<typename T>
+void print_result(const char *source)
+{
+	const char *from=source;
+	printf("\"%s\" as %d - read %d chars. left - \"%s\"\n",from,T::Parse(source),source-from,source);
+}
+
 
 int main()
 {
@@ -107,11 +129,22 @@ int main()
 		printf("\n");
 	}
 	{
-		typedef parser::Text<'a','i','u','e','o'> seq;
-
-		const char *source="aiueooo";
-
-		printf("%d - %s\n",seq::Parse(source),source);
+		typedef parser::Text<'a','i','u','e','o'> seq;		
+		print_result<seq>("aiueooo");
+	}
+	{
+		typedef parser::Text<' ','-',' ','-'> seq;
+		print_result<seq>(" - -");
+	}
+	{
+		typedef parser::Text<' '> seq;
+		print_result<seq>(" - -");
+	}
+	{
+		typedef parser::Range<'0','9'> num;
+		print_result<num>("0");
+		print_result<num>("5");
+		print_result<num>("9");
 	}
 
 	return 0;
