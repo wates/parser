@@ -1,186 +1,5 @@
-#ifndef UNUSED
-#define UNUSED(x) (void)(x)
-#endif
 
-namespace parser
-{
-	template <char min,char max>
-	struct CharRange
-	{
-		static bool Parse(const char *&text)
-		{
-			if(min<=*text&&max>=*text)
-			{
-				text++;
-				return true;
-			}
-			return false;
-		}
-	};
-
-	template<char C=0,char... rest>
-	struct CharHasAny
-		//:public CharHasAny<rest...>
-	{
-		static bool Equal(const char *&text)
-		{
-			return C==*text||CharHasAny<rest...>::Equal(text);
-		}
-	};
-
-	template<>
-	struct CharHasAny<0>
-	{
-		static bool Equal(const char *&text)
-		{
-            UNUSED(text);
-			return false;
-		}
-	};
-
-	template<char C,char ...rest>
-	struct Char
-		//:public CharHasAny<C,rest...>
-	{
-		static bool Parse(const char *&text)
-		{
-			if(CharHasAny<C,rest...>::Equal(text))
-			{
-				text++;
-				return true;
-			}
-			return false;
-		}
-	};
-
-	template<char C=0,char...rest>
-	struct CharSequence
-		//:public CharSequence<rest...>
-	{
-		static const int length=1+CharSequence<rest...>::length;
-		static bool Equal(const char *text)
-		{
-			return C==*text&&CharSequence<rest...>::Equal(text+1);
-		}
-	};
-
-	template<char...rest>
-	struct CharSequence<0,rest...>
-	{
-		static const int length=0;
-		static bool Equal(const char *text)
-		{
-            UNUSED(text);
-			return true;
-		}
-	};
-
-	template<char C=0,char...rest>
-	struct Text
-		//:public CharSequence<C,rest...>
-	{
-		static bool Parse(const char *&text)
-		{
-			const char *save=text;
-			if(CharSequence<C,rest...>::Equal(text))
-			{
-				text+=CharSequence<C,rest...>::length;
-				return true;
-			}
-			text=save;
-			return false;
-		}
-	};
-
-	template <char min,char max>
-	struct Range
-	{
-		static bool Parse(const char *&text)
-		{
-			if(min<=*text&&max>=*text)
-			{
-				text++;
-				return true;
-			}
-			return false;
-		}
-	};
-
-	// ここまではプリミティブな式のみ 
-
-
-	// あってもなくてもよい。 
-	template <typename T>
-	struct Option
-		:virtual public T
-	{
-		bool Parse(const char *&text)
-		{
-			T::Parse(text);
-			return true;
-		}
-	};
-
-	// 0 個以上にヒット。あるだけ削る。 
-	template<typename t>
-	struct Any
-		:public t
-	{
-		bool Parse(const char *&text)
-		{
-			while(t::Parse(text));
-			return true;
-		}
-	};
-
-	// 1 個以上にヒット。 
-	template<typename t>
-	struct More
-		:public t
-	{
-		bool Parse(const char *&text)
-		{
-			if(t::Parse(text))
-			{
-				while(t::Parse(text));
-				return true;
-			}
-			return false;
-		}
-	};
-
-
-	// どれかにヒット 
-	struct stop{};
-
-	template<typename t=stop,typename...rest>
-	struct Or
-		:virtual public t
-		,virtual public Or<rest...>
-	{
-		bool Parse(const char *&text)
-		{
-			const char *src=text;
-			if(t::Parse(text))
-				return true;
-			text=src;
-			if(Or<rest...>::Parse(text))
-				return true;
-			text=src;
-			return false;
-		}
-	};
-	template<typename...rest>
-	struct Or<stop,rest...>
-	{
-		static bool Parse(const char *text)
-		{
-            UNUSED(text);
-			return false;
-		}
-	};
-
-}
+#include "parser.h"
 
 #include <stdio.h>
 
@@ -271,6 +90,44 @@ int main()
 		typedef Any<numbet> numbets;
 		print_result<numbets>("abcABC912--");
 		print_result<numbets>("==abcABC912==");
+	}
+	{
+		using namespace parser;
+
+		typedef Range<'0','9'> tNum;
+		typedef Range<'1','9'> tNonZeroNum;
+		typedef Or<Rule<tNonZeroNum,Any<tNum> >,Char<'0'> > tUnsignedInt;
+		typedef Rule<Option<Char<'+'> >,tUnsignedInt> tPositiveNum;
+		typedef Rule<Char<'-'>,tUnsignedInt > tNegativeNum;
+		typedef Or<tPositiveNum,tNegativeNum> tInt;
+
+		typedef Rule<Char<'E','e'>,Option<Char<'+','-'> >,More<tNum> > tLog;
+		typedef Rule<tInt,Option<tLog> > tLogInt;
+
+		typedef Rule<Option<tInt>,Char<'.'>,More<tNum>,Option<tLogInt> > tFloat;
+
+		print_result<tUnsignedInt>("100");
+		print_result<tUnsignedInt>("0123");
+		print_result<tUnsignedInt>("3210");
+		print_result<tUnsignedInt>("-1");
+		print_result<tUnsignedInt>("+10");
+
+		print_result<tInt>("100");
+		print_result<tInt>("0123");
+		print_result<tInt>("3210");
+		print_result<tInt>("-1");
+		print_result<tInt>("-0");
+		print_result<tInt>("-010");
+		print_result<tInt>("+10");
+
+		print_result<tFloat>("10.0");
+		print_result<tFloat>("0.123");
+		print_result<tFloat>("3210.");
+		print_result<tFloat>("-1.0");
+		print_result<tFloat>("-.0");
+		print_result<tFloat>("-0.10");
+		print_result<tFloat>("+1.0");
+		
 	}
 
 
