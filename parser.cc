@@ -102,7 +102,7 @@ int main()
 		typedef Or<tPositiveNum,tNegativeNum> tInt;
 
 		typedef Rule<Char<'E','e'>,Option<Char<'+','-'> >,More<tNum> > tLog;
-		typedef Rule<tInt,Option<tLog> > tLogInt;
+		typedef Rule<Option<tInt>,Option<tLog> > tLogInt;
 
 		typedef Rule<Option<tInt>,Char<'.'>,More<tNum>,Option<tLogInt> > tFloat;
 
@@ -123,9 +123,9 @@ int main()
 		print_result<tFloat>("10.0");
 		print_result<tFloat>("0.123");
 		print_result<tFloat>("3210.");
-		print_result<tFloat>("-1.0");
+		print_result<tFloat>("-1.0E+50");
 		print_result<tFloat>("-.0");
-		print_result<tFloat>("-0.10");
+		print_result<tFloat>("-0.10E-3");
 		print_result<tFloat>("+1.0");
 		
 	}
