@@ -145,7 +145,17 @@ int main()
 		print_result<num>("0");
 		print_result<num>("5");
 		print_result<num>("9");
+		print_result<num>("a");
+		print_result<num>("A");
 	}
+	{
+		typedef parser::Range<'a','z'> az;
+		print_result<az>("9");
+		print_result<az>("a");
+		print_result<az>("z");
+		print_result<az>("A");
+	}
+
 
 	return 0;
 }
