@@ -8,7 +8,7 @@ void print_result(const char *source)
 {
 	const char *from=source;
 	T t;
-	printf("\"%s\" as %d - read %d chars. left - \"%s\"\n",from,t.Parse(source),source-from,source);
+	printf("\"%s\" as %d - read %d chars. rest - \"%s\"\n",from,t.Parse(source),source-from,source);
 }
 
 

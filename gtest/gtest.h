@@ -137,30 +137,40 @@
 //
 //   GTEST_HAS_CLONE          - Define it to 1/0 to indicate that clone(2)
 //                              is/isn't available.
+#define GTEST_HAS_CLONE 0
 //   GTEST_HAS_EXCEPTIONS     - Define it to 1/0 to indicate that exceptions
 //                              are enabled.
+#define GTEST_HAS_EXCEPTIONS 0
 //   GTEST_HAS_GLOBAL_STRING  - Define it to 1/0 to indicate that ::string
 //                              is/isn't available (some systems define
 //                              ::string, which is different to std::string).
+#define GTEST_HAS_GLOBAL_STRING 0
 //   GTEST_HAS_GLOBAL_WSTRING - Define it to 1/0 to indicate that ::string
 //                              is/isn't available (some systems define
 //                              ::wstring, which is different to std::wstring).
+#define GTEST_HAS_GLOBAL_WSTRING 0
 //   GTEST_HAS_PTHREAD        - Define it to 1/0 to indicate that <pthread.h>
 //                              is/isn't available.
+#define GTEST_HAS_PTHREAD 0
 //   GTEST_HAS_RTTI           - Define it to 1/0 to indicate that RTTI is/isn't
 //                              enabled.
+#define GTEST_HAS_RTTI 0
 //   GTEST_HAS_STD_WSTRING    - Define it to 1/0 to indicate that
 //                              std::wstring does/doesn't work (Google Test can
 //                              be used where std::wstring is unavailable).
+#define GTEST_HAS_STD_WSTRING 0
 //   GTEST_HAS_TR1_TUPLE      - Define it to 1/0 to indicate tr1::tuple
 //                              is/isn't available.
+#define GTEST_HAS_TR1_TUPLE 0
 //   GTEST_HAS_SEH            - Define it to 1/0 to indicate whether the
 //                              compiler supports Microsoft's "Structured
 //                              Exception Handling".
+#define GTEST_HAS_SEH 0
 //   GTEST_USE_OWN_TR1_TUPLE  - Define it to 1/0 to indicate whether Google
 //                              Test's own tr1 tuple implementation should be
 //                              used.  Unused when the user sets
 //                              GTEST_HAS_TR1_TUPLE to 0.
+#define GTEST_USE_OWN_TR1_TUPLE 1
 //   GTEST_LINKED_AS_SHARED_LIBRARY
 //                            - Define to 1 when compiling tests that use
 //                              Google Test as a shared library (known as
