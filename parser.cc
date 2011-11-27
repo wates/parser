@@ -104,8 +104,6 @@ int main()
 		typedef Rule<Char<'E','e'>,Option<Char<'+','-'> >,More<tNum> > tLog;
 		typedef Rule<Option<tInt>,Option<tLog> > tLogInt;
 
-		typedef Rule<Option<tInt>,Char<'.'>,More<tNum>,Option<tLogInt> > tFloat;
-
 		print_result<tUnsignedInt>("100");
 		print_result<tUnsignedInt>("0123");
 		print_result<tUnsignedInt>("3210");
@@ -120,6 +118,8 @@ int main()
 		print_result<tInt>("-010");
 		print_result<tInt>("+10");
 
+		typedef Rule<Option<tInt>,Char<'.'>,More<tNum>,Option<tLogInt> > tFloat;
+
 		print_result<tFloat>("10.0");
 		print_result<tFloat>("0.123");
 		print_result<tFloat>("3210.");
@@ -128,6 +128,43 @@ int main()
 		print_result<tFloat>("-0.10E-3");
 		print_result<tFloat>("+1.0");
 		
+		typedef More<Char<' ','\t','\r','\n'> > tS;
+	}
+
+	{
+		/*
+		   file = [header CRLF] record *(CRLF record) [CRLF]
+		   header = name *(COMMA name)
+		   record = field *(COMMA field)
+		   name = field
+		   field = (escaped / non-escaped)
+		   escaped = DQUOTE *(TEXTDATA / COMMA / CR / LF / 2DQUOTE) DQUOTE
+		   non-escaped = *TEXTDATA
+		   COMMA = %x2C
+		   CR = %x0D ;as per section 6.1 of RFC 2234 [2]
+		   DQUOTE =  %x22 ;as per section 6.1 of RFC 2234 [2]
+		   LF = %x0A ;as per section 6.1 of RFC 2234 [2]
+		   CRLF = CR LF ;as per section 6.1 of RFC 2234 [2]
+		   TEXTDATA =  %x20-21 / %x23-2B / %x2D-7E
+		*/
+
+		using namespace parser;
+
+		typedef Or<Range<0x20,0x21>,Range<0x23,0x2b>,Range<0x2d,0x7e> > TEXTDATA;
+		typedef Char<0x0a> LF;
+		typedef Char<0x22> DQUATE;
+		typedef Char<0x0d> CR;
+		typedef Rule<CR,LF> CRLF;
+		typedef Char<0x2c> COMMA;
+		typedef Any<TEXTDATA> non_escaped;
+		typedef Rule<DQUATE,Any<Or<TEXTDATA,COMMA,CR,LF,Rule<DQUATE,DQUATE> > >,DQUATE> escaped;
+		typedef Or<escaped,non_escaped> field;
+		typedef field name;
+		typedef Rule<field,Any<Rule<COMMA,field> > > record;
+		typedef Rule<name,Any<Rule<COMMA,name> > > header;
+		typedef Rule<Option<Rule<header,CRLF> >,record,Any<Rule<CRLF,record> >,Option<CRLF> > file;
+
+		print_result<file>("100,200,300\r\nabc,def,ghij");
 	}
 
 
