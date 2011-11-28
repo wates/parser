@@ -155,12 +155,12 @@ int main()
 
 		using namespace parser;
 
-		typedef Or<Range<0x20,0x21>,Range<0x23,0x2b>,Range<0x2d,0x7e> > TEXTDATA;
-		typedef Char<0x0a> LF;
+		typedef Or<Range<0x20,0x21>,Range<0x23,0x2B>,Range<0x2D,0x7E> > TEXTDATA;
+		typedef Char<0x0A> LF;
 		typedef Char<0x22> DQUATE;
-		typedef Char<0x0d> CR;
+		typedef Char<0x0D> CR;
 		typedef Rule<CR,LF> CRLF;
-		typedef Char<0x2c> COMMA;
+		typedef Char<0x2C> COMMA;
 		typedef Any<TEXTDATA> non_escaped;
 		typedef Rule<DQUATE,Any<Or<TEXTDATA,COMMA,CR,LF,Rule<DQUATE,DQUATE> > >,DQUATE> escaped;
 		typedef Or<escaped,non_escaped> field;
@@ -170,6 +170,16 @@ int main()
 		typedef Rule<Option<Rule<header,CRLF> >,record,Any<Rule<CRLF,record> >,Option<CRLF> > file;
 
 		print_result<file>("100,200,300\r\nabc,def,ghij");
+
+        // 空行や空レコードは OK 
+		print_result<file>("100,200,300\r\nabc,def,ghij,,\r\n\r\n");
+
+        // 二重引用符はカンマと一体でないとだめ 
+		print_result<file>("100,200,300\r\nabc,d\"ef,g\"hij");
+		print_result<file>("100,200,300\r\nabc,\"def,g\",hij");
+
+        // 改行は CRLF でないとだめ
+		print_result<file>("100,200,300\nabc,def,ghij");
 	}
 
 
