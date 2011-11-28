@@ -17,7 +17,7 @@ int main()
 	{
 		typedef parser::Char<'a','i','u','e','o'> charany;
 
-		const char *source="ouieaieA";
+		const char *source="ouieaieAaiueo";
 		while(charany::Parse(source))
 			printf("1");
 		printf("\n");
@@ -25,10 +25,13 @@ int main()
 	{
 		typedef parser::Text<'a','i','u','e','o'> seq;		
 		print_result<seq>("aiueooo");
+		print_result<seq>("aiuooo");
 	}
 	{
 		typedef parser::Text<' ','-',' ','-'> seq;
 		print_result<seq>(" - -");
+		print_result<seq>(" - -!");
+		print_result<seq>(" !");
 	}
 	{
 		typedef parser::Text<' '> seq;
@@ -133,6 +136,8 @@ int main()
 
 	{
 		/*
+           copied from RFC4180
+
 		   file = [header CRLF] record *(CRLF record) [CRLF]
 		   header = name *(COMMA name)
 		   record = field *(COMMA field)
