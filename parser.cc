@@ -4,6 +4,28 @@
 #include <stdio.h>
 
 template<typename T>
+struct WithPrint
+    :public T
+{
+    bool Parse(const char *&text)
+    {
+        const char *begin=text;
+        if(this->T::Parse(text))
+        {
+            char tmp=*text;
+            *const_cast<char*>(text)='\0';
+            printf("<%s> ",begin);
+            *const_cast<char*>(text)=tmp;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+};
+
+template<typename T>
 void print_result(const char *source)
 {
 	const char *from=source;
@@ -131,7 +153,6 @@ int main()
 		print_result<tFloat>("-0.10E-3");
 		print_result<tFloat>("+1.0");
 		
-		typedef More<Char<' ','\t','\r','\n'> > tS;
 	}
 
 	{
@@ -163,7 +184,8 @@ int main()
 		typedef Char<0x2C> COMMA;
 		typedef Any<TEXTDATA> non_escaped;
 		typedef Rule<DQUATE,Any<Or<TEXTDATA,COMMA,CR,LF,Rule<DQUATE,DQUATE> > >,DQUATE> escaped;
-		typedef Or<escaped,non_escaped> field;
+		typedef WithPrint<Or<escaped,non_escaped> > field;
+		//typedef Or<escaped,non_escaped> field;
 		typedef field name;
 		typedef Rule<field,Any<Rule<COMMA,field> > > record;
 		typedef Rule<name,Any<Rule<COMMA,name> > > header;
@@ -178,8 +200,15 @@ int main()
 		print_result<file>("100,200,300\r\nabc,d\"ef,g\"hij");
 		print_result<file>("100,200,300\r\nabc,\"def,g\",hij");
 
-        // 改行は CRLF でないとだめ
+        // 改行は CRLF でないとだめ 
+        // ヘッダの最後のほうまでマッチするが CRLF が無いのでヘッダに完全にはマッチしない 
+        // その後レコードには CRLF は不要なのでレコードとして一行目だけマッチする 
 		print_result<file>("100,200,300\nabc,def,ghij");
+
+        // 二重引用符を含めるなら二連続にしてさらに二重引用符で括ってある必要がある 
+		print_result<file>("100,200,\"3\"\"00\"\r\nabc,def,ghij");
+
+		typedef More<Char<' ','\t','\r','\n'> > S;
 	}
 
 

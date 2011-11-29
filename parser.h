@@ -102,7 +102,8 @@ namespace parser
     {
         bool Parse(const char *&text)
         {
-            while(T::Parse(text));
+            while(T::Parse(text))
+                continue;
             return true;
         }
     };
@@ -116,10 +117,14 @@ namespace parser
         {
             if(T::Parse(text))
             {
-                while(T::Parse(text));
+                while(T::Parse(text))
+                    continue;
                 return true;
             }
-            return false;
+            else
+            {
+                return false;
+            }
         }
     };
 
