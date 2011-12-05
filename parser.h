@@ -80,10 +80,10 @@ namespace parser
         }
     };
 
-    // ‚±‚±‚Ü‚Å‚ÍƒvƒŠƒ~ƒeƒBƒu‚È®‚Ì‚İ 
+    // ã“ã“ã¾ã§ã¯ãƒ—ãƒªãƒŸãƒ†ã‚£ãƒ–ãªå¼ã®ã¿ 
 
 
-    // ‚ ‚Á‚Ä‚à‚È‚­‚Ä‚à‚æ‚¢B 
+    // ã‚ã£ã¦ã‚‚ãªãã¦ã‚‚ã‚ˆã„ã€‚ 
     template <typename T>
     struct Option
         :virtual public T
@@ -95,7 +95,7 @@ namespace parser
         }
     };
 
-    // 0 ŒÂˆÈã‚ÉƒqƒbƒgB‚ ‚é‚¾‚¯í‚éB 
+    // 0 å€‹ä»¥ä¸Šã«ãƒ’ãƒƒãƒˆã€‚ã‚ã‚‹ã ã‘å‰Šã‚‹ã€‚ 
     template<typename T>
     struct Any
         :public T
@@ -108,7 +108,7 @@ namespace parser
         }
     };
 
-    // 1 ŒÂˆÈã‚ÉƒqƒbƒgB 
+    // 1 å€‹ä»¥ä¸Šã«ãƒ’ãƒƒãƒˆã€‚ 
     template<typename T>
     struct More
         :public T
@@ -129,7 +129,7 @@ namespace parser
     };
 
 
-    // ‚Ç‚ê‚©‚Éƒqƒbƒg 
+    // ã©ã‚Œã‹ã«ãƒ’ãƒƒãƒˆ 
     struct stop{};
 
     template<typename T=stop,typename...rest>
