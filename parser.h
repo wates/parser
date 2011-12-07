@@ -130,9 +130,7 @@ namespace parser
 
 
     // どれかにヒット 
-    struct stop{};
-
-    template<typename T=stop,typename...rest>
+    template<typename T=void,typename...rest>
     struct Or
         :virtual public T
         ,virtual public Or<rest...>
@@ -150,7 +148,7 @@ namespace parser
         }
     };
     template<typename...rest>
-    struct Or<stop,rest...>
+    struct Or<void,rest...>
     {
         static bool Parse(const char *text)
         {
@@ -159,7 +157,7 @@ namespace parser
         }
     };
 
-    template<typename T=stop,typename...rest>
+    template<typename T=void,typename...rest>
     struct Rule
         :virtual public T
         ,virtual public Rule<rest...>
@@ -176,7 +174,7 @@ namespace parser
     };
 
     template<typename...rest>
-    struct Rule<stop,rest...>
+    struct Rule<void,rest...>
     {
         static bool Parse(const char *text)
         {
