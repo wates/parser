@@ -30,7 +30,7 @@ void print_result(const char *source)
 {
     const char *from=source;
     T t;
-    printf("\"%s\" as %d - read %d chars. rest - \"%s\"\n",from,t.Parse(source),source-from,source);
+    printf("\"%s\" as %s - read %d chars. rest - \"%s\"\n",from,t.Parse(source)?"GOOD":"BAD",source-from,source);
 }
 
 
@@ -45,15 +45,10 @@ int main()
         printf("\n");
     }
     {
-        typedef parser::Text<'a','i','u','e','o'> seq;		
-        print_result<seq>("aiueooo");
-        print_result<seq>("aiuooo");
-    }
-    {
-        typedef parser::Text<' ','-',' ','-'> seq;
-        print_result<seq>(" - -");
-        print_result<seq>(" - -!");
-        print_result<seq>(" !");
+        typedef parser::Text<'a','i','u','e','o'> text;		
+        print_result<text>("aiueooo");
+        print_result<text>("aiuooo");
+        print_result<text>("aaiueo");
     }
     {
         typedef parser::Text<' '> seq;
@@ -66,8 +61,7 @@ int main()
         print_result<num>("9");
         print_result<num>("a");
         print_result<num>("A");
-    }
-    {
+
         typedef parser::Range<'a','z'> az;
         print_result<az>("9");
         print_result<az>("a");
@@ -78,25 +72,14 @@ int main()
         typedef parser::Text<'f','o','o'> seq;
         typedef parser::Option<seq> opt;
         print_result<opt>("foofoofoo");
-    }
-    {
-        typedef parser::Text<'f','o','o'> seq;
-        typedef parser::Option<seq> opt;
         print_result<opt>("vvfoofoofoo");
-    }
-    {
-        typedef parser::Text<'f','o','o'> seq;
+
         typedef parser::Any<seq> any;
         print_result<any>("foofoofoo");
-    }
-    {
-        typedef parser::Text<'f','o','o'> seq;
+        print_result<any>("vvfoofoofoo");
+
         typedef parser::More<seq> more;
         print_result<more>("foofoofoo");
-    }
-    {
-        typedef parser::Text<'f','o','o'> seq;
-        typedef parser::More<seq> more;
         print_result<more>("vvfoofoofoo");
     }
     {
