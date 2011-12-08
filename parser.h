@@ -41,6 +41,7 @@ namespace parser
     {
         static bool Parse(const char *&text)
         {
+            //return (C==*text++ && Text<rest...>::Parse(text) ) || (text--,false);
             if(C==*text++ &&
                 Text<rest...>::Parse(text))
             {
@@ -102,6 +103,7 @@ namespace parser
     {
         bool Parse(const char *&text)
         {
+            //return (T::Parse(text) && Any<T>::Parse(text) ) || true;
             while(T::Parse(text))
                 continue;
             return true;
@@ -137,14 +139,7 @@ namespace parser
     {
         bool Parse(const char *&text)
         {
-            const char *src=text;
-            if(T::Parse(text))
-                return true;
-            text=src;
-            if(Or<rest...>::Parse(text))
-                return true;
-            text=src;
-            return false;
+            return T::Parse(text) || Or<rest...>::Parse(text);
         }
     };
     template<typename...rest>
