@@ -99,7 +99,7 @@ namespace parser
     // 0 個以上にヒット。あるだけ削る。 
     template<typename T>
     struct Any
-        :public T
+        :virtual public T
     {
         bool Parse(const char *&text)
         {
@@ -113,7 +113,7 @@ namespace parser
     // 1 個以上にヒット。 
     template<typename T>
     struct More
-        :public T
+        :virtual public T
     {
         bool Parse(const char *&text)
         {

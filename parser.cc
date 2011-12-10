@@ -2,26 +2,44 @@
 #include "parser.h"
 
 #include <stdio.h>
+#include <string.h>
 
 template<typename T>
-struct WithPrint
+struct Value
     :public T
 {
+    char value[16][16];
+    int size;
+    Value():size(0){};
+
     bool Parse(const char *&text)
     {
         const char *begin=text;
         if(this->T::Parse(text))
         {
-            char tmp=*text;
-            *const_cast<char*>(text)='\0';
-            printf("<%s> ",begin);
-            *const_cast<char*>(text)=tmp;
+            memcpy(value[size],begin,text-begin);
+            value[size++][text-begin]='\0';
             return true;
         }
-        else
+        return false;
+    }
+};
+
+template<typename T>
+struct Record
+{
+    T record[16];
+    int record_size;
+    Record():record_size(0){};
+
+    bool Parse(const char *&text)
+    {
+        if(record[record_size].Parse(text))
         {
-            return false;
+            record_size++;
+            return true;
         }
+        return false;
     }
 };
 
@@ -167,10 +185,9 @@ int main()
         typedef Char<0x2C> COMMA;
         typedef Any<TEXTDATA> non_escaped;
         typedef Rule<DQUATE,Any<Or<TEXTDATA,COMMA,CR,LF,Rule<DQUATE,DQUATE> > >,DQUATE> escaped;
-        typedef WithPrint<Or<escaped,non_escaped> > field;
-        //typedef Or<escaped,non_escaped> field;
+        typedef Value<Or<escaped,non_escaped> > field;
         typedef field name;
-        typedef Rule<field,Any<Rule<COMMA,field> > > record;
+        typedef Record<Rule<field,Any<Rule<COMMA,field> > > > record;
         typedef Rule<name,Any<Rule<COMMA,name> > > header;
         typedef Rule<Option<Rule<header,CRLF> >,record,Any<Rule<CRLF,record> >,Option<CRLF> > file;
 
@@ -191,7 +208,19 @@ int main()
         // 二重引用符を含めるなら二連続にしてさらに二重引用符で括ってある必要がある 
         print_result<file>("100,200,\"3\"\"00\"\r\nabc,def,ghij");
 
-        typedef More<Char<' ','\t','\r','\n'> > S;
+        file csv;
+        const char *text="100,200,\"3\"\"00\"\r\nabc,def,ghij\r\nfoo,bar,baz";
+        csv.Parse(text);
+
+        printf("%d\n",csv.size);
+        printf("%d\n",csv.record_size);
+
+        for(int j=0;j<csv.size;j++)
+            printf("%d : %s\n",j,csv.value[j]);
+
+        for(int i=0;i<csv.record_size;i++)
+            for(int j=0;j<csv.record[i].size;j++)
+                printf("%d,%d : %s\n",i,j,csv.record[i].value[j]);
     }
 
 
